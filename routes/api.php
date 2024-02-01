@@ -19,4 +19,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResource('times', TimeslotController::class)->except(['show']);
+Route::get('timer', [TimeslotController::class, 'index']);
+Route::post('timer', [TimeslotController::class, 'store']);
+Route::put('timer/{id}', [TimeslotController::class, 'update']);
+Route::delete('timer/{id}', [TimeslotController::class, 'destroy']);

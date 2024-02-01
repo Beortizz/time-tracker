@@ -28,25 +28,26 @@ class TimeslotController extends Controller
         $startTime = Carbon::createFromFormat('H:i', $request->start_time);
         $endTime = Carbon::createFromFormat('H:i', $request->end_time);
 
-        if ($endTime->lessThan($startTime)) {
-            $endTime->addDay();
-        }
+        // if ($endTime->lessThan($startTime)) {
+        //     $endTime->addDay();
+        // }
 
         if ($startTime->diffInHours($endTime) > 24) {
             return response()->json(['error' => 'A diferença entre a hora de início e a hora de término não pode exceder 24 horas.'], 422);
         }
 
         $timeslot = Timeslot::create($request->all());
+
         return response()->json(['message' => 'Timeslot created', 'timeslot' => $timeslot]);
     }
 
-    public function update(Request $request, Timeslot $timeslot)
+    public function update(Request $request, $id)
     {
         // $this->validate($request, [
         //     'start_time' => 'required|date_format:H:i',
         //     'end_time' => 'required|date_format:H:i|after:start_time',
         // ]);
-
+        $timeslot = Timeslot::find($id);
         $startTime = Carbon::createFromFormat('H:i', $request->start_time);
         $endTime = Carbon::createFromFormat('H:i', $request->end_time);
     
@@ -57,8 +58,9 @@ class TimeslotController extends Controller
         return response()->json(['message' => 'Timeslot updated', 'timeslot' => $timeslot]);
     }
 
-    public function destroy(Timeslot $timeslot)
+    public function destroy($id)
     {
+        $timeslot = Timeslot::find($id);
         $timeslot->delete();
         return response()->json(['message' => 'Timeslot deleted']);
     }

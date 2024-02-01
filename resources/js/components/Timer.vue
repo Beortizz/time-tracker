@@ -13,6 +13,10 @@
       <template v-slot:tableBody>
         <tr v-for="row in rows" :key="id">
           <td v-for="(value, key) in row" :key="value">{{ value }}</td>
+          <td>
+            <button class="btn btn-success" @click="editTimeslot(row.id)">Edit</button>
+            <button class="btn btn-danger" @click="deleteTimeslot(row.id)">Delete</button>
+          </td>
         </tr>
       </template>
     </Table>
@@ -69,7 +73,7 @@ export default {
 
     fetchTimeslots() {
       axios
-        .get('/times')
+        .get('/timer')
         .then(response => {
           this.rows = response.data;
         })
@@ -80,7 +84,7 @@ export default {
 
     submitTimeslot() {
       axios
-        .post('/times', {
+        .post('/timerx', {
           start_time: this.start_time,
           end_time: this.end_time
         })
@@ -93,7 +97,6 @@ export default {
           });
           this.start_time = '';
           this.end_time = '';
-          this.$refs.time_modal.hide();
           this.fetchTimeslots();
         })
         .catch(error => {
@@ -105,7 +108,28 @@ export default {
         });
 
 
-    }
+    },
+
+    deleteTimeslot(id) {
+      axios
+        .delete(`/timer/${id}`)
+        .then(response => {
+          this.$swal.fire({
+            icon: 'success',
+            title: 'Horário deletado com sucesso!',
+            showConfirmButton: false,
+            timer: 1500
+          });
+          this.fetchTimeslots();
+        })
+        .catch(error => {
+          this.$swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Algo deu errado!',
+          });
+        });
+    },
 
   },
 
