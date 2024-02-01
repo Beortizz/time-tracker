@@ -16,22 +16,22 @@
         </tr>
       </template>
     </Table>
-    <div class="modal fade" id="time_modal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="time_modal" ref="time_modal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Horários</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <form @submit.prevent="submitTime">
+          <form @submit.prevent="submitTimeslot">
             <div class="modal-body">
               <div class="mb-3">
                 <label for="start_time" class="col-form-label">Horário de Início</label>
-                <input type="time" v-model="end_time" class="form-control" id="start_time">
+                <input type="time" v-model="start_time" class="form-control" id="start_time" required>
               </div>
               <div class="mb-3">
                 <label for="end_time" class="col-form-label">Horário de Saída</label>
-                <input type="time" v-model="end_time" class="form-control" id="end_time">
+                <input type="time" v-model="end_time" class="form-control" id="end_time" required>
               </div>
             </div>
             <div class="modal-footer">
@@ -47,9 +47,9 @@
 
 
 <script>
-import Page from './page.vue';
-import Table from './Table.vue';
+import Page from './Page.vue';
 import axios from '../bootstrap.js';
+import Table from './Table.vue';
 
 export default {
   name: "Timer",
@@ -61,18 +61,24 @@ export default {
   data() {
     return {
       columns: ['Início', 'Fim'],
-      rows: [
-        { start: '08:00', end: '12:00' },
-        { start: '13:00', end: '17:00' },
-        { start: '08:00', end: '12:00' },
-        { start: '13:00', end: '17:00' },
-      ]
+      rows: [],
     }
   },
 
   methods: {
 
-    submitTime() {
+    fetchTimeslots() {
+      axios
+        .get('/times')
+        .then(response => {
+          this.rows = response.data;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+
+    submitTimeslot() {
       axios
         .post('/times', {
           start_time: this.start_time,
@@ -85,6 +91,10 @@ export default {
             showConfirmButton: false,
             timer: 1500
           });
+          this.start_time = '';
+          this.end_time = '';
+          this.$refs.time_modal.hide();
+          this.fetchTimeslots();
         })
         .catch(error => {
           this.$swal.fire({
@@ -101,6 +111,7 @@ export default {
 
   mounted() {
     console.log('Component mounted Timer.')
+    this.fetchTimeslots();
   }
 }
 </script>
