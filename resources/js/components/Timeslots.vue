@@ -124,6 +124,7 @@ export default {
       axios
         .get('/timeslots')
         .then(response => {
+
           this.rows = response.data.timeslots;
           this.totalDayHours = response.data.totalDayHours;
           this.totalNightHours = response.data.totalNightHours;
