@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use DateTime;
 
 class Timeslot extends Model
 {
@@ -17,24 +18,22 @@ class Timeslot extends Model
 
     public function calculateNightAndDayHours()
     {
-        $start = Carbon::createFromFormat('H:i', $this->start_time);
-        $end = Carbon::createFromFormat('H:i', $this->end_time);
-
+        $startTime = Carbon::createFromFormat('Y-m-d H:i:s', $this->start_time);
+        $endTime = Carbon::createFromFormat('Y-m-d H:i:s', $this->end_time);
+             
         $nightHours = 0;
         $dayHours = 0;
-
-        $diffInHours = $start->diffInHours($end);
-
-        for ($i = 0; $i < $diffInHours; $i++) {
-            if ($start->hour >= 22 || $start->hour < 5) {
-                $nightHours++;
-            } else {
+    
+        for ($hour = clone $startTime; $hour->lt($endTime); $hour->addHour()) {
+            if ($hour->hour >= 5 && $hour->hour < 22) {
                 $dayHours++;
+            } else {
+                $nightHours++;
             }
-
-            $start->addHour();
         }
 
+    
         return ['night_hours' => $nightHours, 'day_hours' => $dayHours];
     }
+    
 }

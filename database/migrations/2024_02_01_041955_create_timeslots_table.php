@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('timeslots', function (Blueprint $table) {
             $table->id();
-            $table->time('start_time');
-            $table->time('end_time');
+            $table->dateTime('start_time');
+            $table->dateTime('end_time');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
         });
     }
