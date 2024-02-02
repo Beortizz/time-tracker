@@ -21,12 +21,11 @@ class TimeslotController extends Controller
             $timeslot->day_hours = $hours['day_hours'];
             $totalNightHours += $hours['night_hours'];
             $totalDayHours += $hours['day_hours'];
-
-            $timeslot->start_time = Carbon::createFromFormat('Y-m-d H:i:s', $timeslot->start_time)->format('d/m/Y H:i');
-            $timeslot->end_time = Carbon::createFromFormat('Y-m-d H:i:s', $timeslot->end_time)->format('d/m/Y H:i');
-
             return $timeslot;
         });
+
+        $totalNightHours = round($totalNightHours, 2);
+        $totalDayHours = round($totalDayHours, 2);
 
         return response()->json([
             'timeslots' => $timeslotsWithNightAndDayHours,
@@ -56,7 +55,7 @@ class TimeslotController extends Controller
         return response()->json(['message' => 'Timeslot created', 'timeslot' => $timeslot], 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Timeslot $timeslot)
     {
         $startTime = Carbon::instance(new DateTime($request->start_time));
         $endTime = Carbon::instance(new DateTime($request->end_time));
@@ -68,7 +67,6 @@ class TimeslotController extends Controller
         if ($startTime->diffInHours($endTime) > 24) {
             return response()->json(['error' => 'A diferença entre a hora de início e a hora de término não pode exceder 24 horas.'], 422);
         }
-        $timeslot = Timeslot::find($id);
         $timeslot->update([
             'start_time' => $startTime,
             'end_time' => $endTime,

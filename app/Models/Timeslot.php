@@ -20,18 +20,20 @@ class Timeslot extends Model
     {
         $startTime = Carbon::createFromFormat('Y-m-d H:i:s', $this->start_time);
         $endTime = Carbon::createFromFormat('Y-m-d H:i:s', $this->end_time);
-             
-        $nightHours = 0;
-        $dayHours = 0;
     
-        for ($hour = clone $startTime; $hour->lt($endTime); $hour->addHour()) {
-            if ($hour->hour >= 5 && $hour->hour < 22) {
-                $dayHours++;
+        $nightMinutes = 0;
+        $dayMinutes = 0;
+    
+        for ($time = clone $startTime; $time->lt($endTime); $time->addMinute()) {
+            if ($time->hour >= 5 && $time->hour < 22) {
+                $dayMinutes++;
             } else {
-                $nightHours++;
+                $nightMinutes++;
             }
         }
-
+    
+        $nightHours = round($nightMinutes / 60, 2);
+        $dayHours = round($dayMinutes / 60, 2);
     
         return ['night_hours' => $nightHours, 'day_hours' => $dayHours];
     }

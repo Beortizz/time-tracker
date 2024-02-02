@@ -2,7 +2,7 @@
   <Page>
     <Table title="Horários de Trabalho" :columns="columns">
       <template v-slot:addButton>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#time_modal">
+        <button type="button" class="btn btn-primary" @click="openModal('create')">
           <b><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
               class="mr-2 bi bi-plus-circle-fill" viewBox="0 0 16 16">
               <path
@@ -11,10 +11,11 @@
         </button>
       </template>
       <template v-slot:tableBody>
-        <tr v-for="row in rows" :key="row.id">
-          <td  class="text-center" v-for="(value, key) in row" :key="value">{{ value }}</td>
+        <tr v-for="row in rows.map(mapTableRows)" :key="row.id">
+          <td class="text-center" v-for="(value, key) in row" :key="value">{{ value }}</td>
           <td class="justify-content-center d-flex gap-2">
-            <button class="btn btn-success" data-bs-target="#time_modal" data-bs-toggle="modal" @click="editTimeslot(row.id)">Edit</button>
+            <button type="button" class="btn btn-success"
+              @click="openModal('edit', row.id)">Edit</button>
             <button class="btn btn-danger" @click="deleteTimeslot(row.id)">Delete</button>
           </td>
         </tr>
@@ -53,7 +54,7 @@
             <h5 class="modal-title">Horários</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <form @submit.prevent="submitTimeslot">
+          <form @submit.prevent="handleSubmit(submitAction)">
             <div class="modal-body">
               <div class="mb-3">
                 <label for="start_time" class="col-form-label">Horário de Início</label>
@@ -94,26 +95,68 @@ export default {
       rows: [],
       totalDayHours: 0,
       totalNightHours: 0,
+      submitAction: 'create',
+      start_time: '',
+      end_time: '',
+      currentId: null
       
+
     }
   },
 
   methods: {
 
-    fetchTimeslots() {
+    openModal(action, id = null) 
+    {
+      if (action === 'create') {
+        this.start_time = '';
+        this.end_time = '';
+        this.submitAction = 'create';
+      } else {
+        const timeslot = this.rows.find((timeslot) => timeslot.id === id);
+        this.start_time = timeslot.start_time;
+        this.end_time = timeslot.end_time;
+        this.submitAction = 'edit';
+        this.currentId = id; 
+      }
+
+      new bootstrap.Modal(document.getElementById('time_modal')).show();
+    },
+
+    mapTableRows(timeslot) 
+    {
+      const mappedTimeslot = { ...timeslot }; 
+      mappedTimeslot.start_time = new Date(mappedTimeslot.start_time).toLocaleString().slice(0, -3);
+      mappedTimeslot.end_time = new Date(mappedTimeslot.end_time).toLocaleString().slice(0, -3);
+      return mappedTimeslot; 
+    },
+
+    handleSubmit(action) {
+      if (action === 'edit') {
+        this.updateTimeslot(this.currentId);
+      } else {
+        this.createTimeslot();
+      }
+    },
+
+
+    fetchTimeslots() 
+    {
       axios
         .get('/timeslots')
         .then(response => {
           this.rows = response.data.timeslots;
           this.totalDayHours = response.data.totalDayHours;
           this.totalNightHours = response.data.totalNightHours;
+
         })
         .catch(error => {
           console.log(error);
         });
     },
 
-    submitTimeslot() {
+    createTimeslot() 
+    {
       axios
         .post('/timeslots', {
           start_time: this.start_time,
@@ -127,7 +170,7 @@ export default {
             timer: 1500
           });
           this.start_time = '';
-          this.end_time = ''; 
+          this.end_time = '';
           const modal = document.getElementById('time_modal');
           const modalInstance = bootstrap.Modal.getInstance(modal);
           modalInstance.hide();
@@ -153,7 +196,47 @@ export default {
 
     },
 
-    deleteTimeslot(id) {
+    updateTimeslot(id)
+    {
+      axios
+        .put(`/timeslots/${id}`, {
+          start_time: this.start_time,
+          end_time: this.end_time
+        })
+        .then(response => {
+          this.$swal.fire({
+            icon: 'success',
+            title: 'Horário atualizado com sucesso!',
+            showConfirmButton: false,
+            timer: 1500
+          });
+          this.start_time = '';
+          this.end_time = '';
+          const modal = document.getElementById('time_modal');
+          const modalInstance = bootstrap.Modal.getInstance(modal);
+          modalInstance.hide();
+
+          this.fetchTimeslots();
+        })
+        .catch(error => {
+          if (error.response && error.response.data && error.response.data.error) {
+            this.$swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: error.response.data.error,
+            });
+          } else {
+            this.$swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'Algo deu errado!',
+            });
+          }
+        });
+    },
+
+    deleteTimeslot(id) 
+    {
       this.$swal.fire({
         title: 'Você tem certeza?',
         text: "Você não poderá reverter isso!",
@@ -189,7 +272,8 @@ export default {
 
   },
 
-  mounted() {
+  mounted() 
+  {
     console.log('Component mounted Timer.')
     this.fetchTimeslots();
   }
