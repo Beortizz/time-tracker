@@ -9,19 +9,11 @@
 </template>
 
 <script>
-import Sidebar from "./sidebar.vue";
 export default {
     name: "Page",
-    components: {
-        Sidebar
-    },
-    props : {
-        hideSidebar: {
-            type: Boolean,
-            default: false,
-            required: false
-        }
-    },
-
+  
+    mounted() {
+        console.log("Component mounted.");
+    }
 }
 </script>

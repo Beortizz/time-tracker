@@ -14,65 +14,45 @@
         <tr v-for="row in rows.map(mapTableRows)" :key="row.id">
           <td class="text-center" v-for="(value, key) in row" :key="value">{{ value }}</td>
           <td class="justify-content-center d-flex gap-2">
-            <button type="button" class="btn btn-success"
-              @click="openModal('edit', row.id)">Edit</button>
+            <button type="button" class="btn btn-success" @click="openModal('edit', row.id)">Edit</button>
             <button class="btn btn-danger" @click="deleteTimeslot(row.id)">Delete</button>
           </td>
         </tr>
       </template>
     </Table>
     <div class="mt-4">
-      <div class="card">
-        <div class="card-header d-flex justify-content-between">
-          <h3 class="table-title m-0"> Resumo das Horas trabalhadas</h3>
-        </div>
-        <div class="card-body table-responsive table-sm">
-          <div class="d-flex justify-content-sm-start mt-4">
-            <table class="w-100 table table-hover dataTableSimple table-striped">
-              <thead>
-                <tr>
-                  <th>Total de Horas Noturnas</th>
-                  <th>Total de Horas Diurnas</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{{ totalNightHours }}</td>
-                  <td>{{ totalDayHours }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <Table title="Resumo das Horas Trabalhadas" :columns="hoursSummaryColumns">
+        <template v-slot:tableBody>
+          <tr>
+            <td class="text-center">{{ totalDayHours }}</td>
+            <td class="text-center">{{ totalNightHours }}</td>
+          </tr>
+        </template>
+      </Table>
     </div>
 
-    <div class="modal fade" id="time_modal" ref="time_modal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Horários</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+    <Modal title="Formulário de Horário " id="time_modal">
+      <template v-slot:modalBody>
+        <form @submit.prevent="handleSubmit(submitAction)">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="start_time" class="col-form-label">Horário de Início</label>
+              <input type="datetime-local" v-model="start_time" class="form-control" id="start_time" required>
+            </div>
+            <div class="mb-3">
+              <label for="end_time" class="col-form-label">Horário de Saída</label>
+              <input type="datetime-local" v-model="end_time" class="form-control" id="end_time" required>
+            </div>
           </div>
-          <form @submit.prevent="handleSubmit(submitAction)">
-            <div class="modal-body">
-              <div class="mb-3">
-                <label for="start_time" class="col-form-label">Horário de Início</label>
-                <input type="datetime-local" v-model="start_time" class="form-control" id="start_time" required>
-              </div>
-              <div class="mb-3">
-                <label for="end_time" class="col-form-label">Horário de Saída</label>
-                <input type="datetime-local" v-model="end_time" class="form-control" id="end_time" required>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-              <button type="submit" class="btn btn-primary">Enviar</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            <button type="submit" class="btn btn-primary">Enviar</button>
+          </div>
+        </form>
+      </template>
+    </Modal>
+
   </Page>
 </template>
 
@@ -81,17 +61,20 @@
 import Page from './Page.vue';
 import axios from '../bootstrap.js';
 import Table from './Table.vue';
+import Modal from './Modal.vue';
 
 export default {
-  name: "Timer",
+  name: "Timeslots",
   components: {
     Page,
-    Table
+    Table,
+    Modal
   },
 
   data() {
     return {
       columns: ['ID', 'Início', 'Fim', 'Horas Noturnas', 'Horas Diurnas', 'Ações'],
+      hoursSummaryColumns: ['Total de Horas Diurnas', 'Total de Horas Noturnas'],
       rows: [],
       totalDayHours: 0,
       totalNightHours: 0,
@@ -99,15 +82,14 @@ export default {
       start_time: '',
       end_time: '',
       currentId: null
-      
+
 
     }
   },
 
   methods: {
 
-    openModal(action, id = null) 
-    {
+    openModal(action, id = null) {
       if (action === 'create') {
         this.start_time = '';
         this.end_time = '';
@@ -117,18 +99,17 @@ export default {
         this.start_time = timeslot.start_time;
         this.end_time = timeslot.end_time;
         this.submitAction = 'edit';
-        this.currentId = id; 
+        this.currentId = id;
       }
 
       new bootstrap.Modal(document.getElementById('time_modal')).show();
     },
 
-    mapTableRows(timeslot) 
-    {
-      const mappedTimeslot = { ...timeslot }; 
+    mapTableRows(timeslot) {
+      const mappedTimeslot = { ...timeslot };
       mappedTimeslot.start_time = new Date(mappedTimeslot.start_time).toLocaleString().slice(0, -3);
       mappedTimeslot.end_time = new Date(mappedTimeslot.end_time).toLocaleString().slice(0, -3);
-      return mappedTimeslot; 
+      return mappedTimeslot;
     },
 
     handleSubmit(action) {
@@ -140,8 +121,7 @@ export default {
     },
 
 
-    fetchTimeslots() 
-    {
+    fetchTimeslots() {
       axios
         .get('/timeslots')
         .then(response => {
@@ -155,8 +135,7 @@ export default {
         });
     },
 
-    createTimeslot() 
-    {
+    createTimeslot() {
       axios
         .post('/timeslots', {
           start_time: this.start_time,
@@ -196,8 +175,7 @@ export default {
 
     },
 
-    updateTimeslot(id)
-    {
+    updateTimeslot(id) {
       axios
         .put(`/timeslots/${id}`, {
           start_time: this.start_time,
@@ -235,8 +213,7 @@ export default {
         });
     },
 
-    deleteTimeslot(id) 
-    {
+    deleteTimeslot(id) {
       this.$swal.fire({
         title: 'Você tem certeza?',
         text: "Você não poderá reverter isso!",
@@ -272,8 +249,7 @@ export default {
 
   },
 
-  mounted() 
-  {
+  mounted() {
     console.log('Component mounted Timer.')
     this.fetchTimeslots();
   }

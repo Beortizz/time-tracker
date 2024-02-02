@@ -1,27 +1,25 @@
 <template>
-    <div>
-        <div class="card">
-            <div class="card-header d-flex justify-content-between">
-                <h3 class="table-title m-0">{{ title }}</h3>
-                <div class="input-group input-group-sm w-auto">
-                    <slot name="addButton">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h3 class="table-title m-0">{{ title }}</h3>
+            <div class="input-group input-group-sm w-auto">
+                <slot name="addButton">
 
-                    </slot>
-                </div>
+                </slot>
             </div>
-            <div class="card-body table-responsive table-sm">
-                <table class="w-100 table table-hover dataTableSimple table-striped">
-                    <thead>
-                        <tr>
-                            <th class="text-center" v-for="column in columns" :key="column">{{ column }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <slot name="tableBody"></slot>
-                    </tbody>
-                </table>
-                <div class="d-flex justify-content-sm-start mt-4">
-                </div>
+        </div>
+        <div class="card-body table-responsive table-sm">
+            <table class="w-100 table table-hover dataTableSimple table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-center" v-for="column in columns" :key="column">{{ column }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <slot name="tableBody"></slot>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-sm-start mt-4">
             </div>
         </div>
     </div>
