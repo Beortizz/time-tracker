@@ -14,8 +14,12 @@
         <tr v-for="row in rows.map(mapTableRows)" :key="row.id">
           <td class="text-center" v-for="(value, key) in row" :key="value">{{ value }}</td>
           <td class="justify-content-center d-flex gap-2">
-            <button type="button" class="btn btn-success" @click="openModal('edit', row.id)">Edit</button>
-            <button class="btn btn-danger" @click="deleteTimeslot(row.id)">Delete</button>
+            <button type="button" class="btn btn-success d-flex align-items-center justify-content-center" @click="openModal('edit', row.id)"><span class="material-symbols-outlined">
+              edit
+              </span></button>
+            <button class="btn btn-danger d-flex align-items-center justify-content-center" @click="deleteTimeslot(row.id)"><span class="material-symbols-outlined">
+              delete
+              </span></button>
           </td>
         </tr>
       </template>
