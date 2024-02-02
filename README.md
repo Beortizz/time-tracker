@@ -27,9 +27,9 @@ Este projeto é uma aplicação de gerenciamento de registros de horas de trabal
 
 ## Funcionalidades Principais
 
-- **Registro de Horas:** Permite aos usuários registrar as horas trabalhadas, especificando se foram horas diurnas ou noturnas, além de outras informações relevantes, como data e atividades realizadas.
+- **Registro de Horas:** Permite aos usuários registrar as horas trabalhadas, especificando se foram horas diurnas ou noturnas.
 
-- **Visualização de Horas Trabalhadas:** Os usuários podem visualizar um resumo das horas trabalhadas em um determinado período, bem como análises detalhadas sobre as horas diurnas e noturnas separadamente.
+- **Visualização de Horas Trabalhadas:** Os usuários podem visualizar um resumo das horas trabalhadas em um determinado período.    
 
 ## Como Rodar o Projeto
 
@@ -53,7 +53,7 @@ composer install
 npm install
 ```
 3. **Configure o ambiente**
- - Copie e cole o arquivo .env.example o nomeie .env
+ - Copie e cole o arquivo .env.example e o nomeie .env
  - Atualize as seguintes variaveis para o seu banco de dados MySql
  ```properties
 DB_CONNECTION=mysql
