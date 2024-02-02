@@ -37,5 +37,7 @@ class Timeslot extends Model
     
         return ['night_hours' => $nightHours, 'day_hours' => $dayHours];
     }
+
+  
     
 }

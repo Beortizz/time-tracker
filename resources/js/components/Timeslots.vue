@@ -24,33 +24,29 @@
       <Table title="Resumo das Horas Trabalhadas" :columns="hoursSummaryColumns">
         <template v-slot:tableBody>
           <tr>
-            <td class="text-center">{{ totalDayHours }}</td>
-            <td class="text-center">{{ totalNightHours }}</td>
+            <td class="text-center">{{ `${totalNightHours.hours}`.padStart(2, '0') + ':' + `${totalNightHours.minutes.toFixed(0)}`.padStart(2, '0') }}</td>
+            <td class="text-center">{{ `${totalDayHours.hours}`.padStart(2, '0') + ':' + `${totalDayHours.minutes.toFixed(0)}`.padStart(2, '0') }} </td>
           </tr>
         </template>
       </Table>
     </div>
-
-
     <Modal title="Formulário de Horário " id="time_modal">
-      <template v-slot:modalBody>
-        <form @submit.prevent="handleSubmit(submitAction)">
-          <div class="modal-body">
-            <div class="mb-3">
-              <label for="start_time" class="col-form-label">Horário de Início</label>
-              <input type="datetime-local" v-model="start_time" class="form-control" id="start_time" required>
-            </div>
-            <div class="mb-3">
-              <label for="end_time" class="col-form-label">Horário de Saída</label>
-              <input type="datetime-local" v-model="end_time" class="form-control" id="end_time" required>
-            </div>
+      <form @submit.prevent="handleSubmit(submitAction)">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="start_time" class="col-form-label">Horário de Início</label>
+            <input type="datetime-local" v-model="start_time" class="form-control" id="start_time" required>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-            <button type="submit" class="btn btn-primary">Enviar</button>
+          <div class="mb-3">
+            <label for="end_time" class="col-form-label">Horário de Saída</label>
+            <input type="datetime-local" v-model="end_time" class="form-control" id="end_time" required>
           </div>
-        </form>
-      </template>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          <button type="submit" class="btn btn-primary">Enviar</button>
+        </div>
+      </form>
     </Modal>
 
   </Page>
@@ -74,7 +70,7 @@ export default {
   data() {
     return {
       columns: ['ID', 'Início', 'Fim', 'Horas Noturnas', 'Horas Diurnas', 'Ações'],
-      hoursSummaryColumns: ['Total de Horas Diurnas', 'Total de Horas Noturnas'],
+      hoursSummaryColumns: ['Total de Horas Noturnas', 'Total de Horas Diurnas'],
       rows: [],
       totalDayHours: 0,
       totalNightHours: 0,
@@ -109,6 +105,9 @@ export default {
       const mappedTimeslot = { ...timeslot };
       mappedTimeslot.start_time = new Date(mappedTimeslot.start_time).toLocaleString().slice(0, -3);
       mappedTimeslot.end_time = new Date(mappedTimeslot.end_time).toLocaleString().slice(0, -3);
+
+      mappedTimeslot.night_hours = `${timeslot.night_hours.hours}`.padStart(2, '0') + ':' + `${timeslot.night_hours.minutes.toFixed(0)}`.padStart(2, '0');
+      mappedTimeslot.day_hours = `${timeslot.day_hours.hours}`.padStart(2, '0') + ':' + `${timeslot.day_hours.minutes.toFixed(0)}`.padStart(2, '0');
       return mappedTimeslot;
     },
 

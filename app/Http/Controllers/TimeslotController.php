@@ -9,29 +9,69 @@ use DateTime;
 
 class TimeslotController extends Controller
 {
+
     public function index()
     {
         $timeslots = Timeslot::orderBy("created_at", "asc")->select('id', 'start_time', 'end_time')->get();
         $totalNightHours = 0;
         $totalDayHours = 0;
 
-        $timeslotsWithNightAndDayHours = $timeslots->map(function ($timeslot) use (&$totalNightHours, &$totalDayHours) {
+        $timeslotsWithNightAndDayHours = $timeslots->map(function ($timeslot) use (&$totalNightHours, &$totalDayHours, &$totalNightMinutes, &$totalDayMinutes) {
             $hours = $timeslot->calculateNightAndDayHours();
-            $timeslot->night_hours = $hours['night_hours'];
-            $timeslot->day_hours = $hours['day_hours'];
+
+            $timeslot->night_hours = floor($hours['night_hours']);
+            $timeslot->day_hours = floor($hours['day_hours']);
+
+            $nightFractionMinutes = $this->convertFractionToMinutes($hours['night_hours']);
+            $dayFractionMinutes = $this->convertFractionToMinutes($hours['day_hours']);
+
+            $totalNightMinutes += $nightFractionMinutes;
+            $totalDayMinutes += $dayFractionMinutes;
+
             $totalNightHours += $hours['night_hours'];
             $totalDayHours += $hours['day_hours'];
+
+            $timeslot->night_minutes = $nightFractionMinutes;
+            $timeslot->day_minutes = $dayFractionMinutes;
+
             return $timeslot;
         });
-
-        $totalNightHours = round($totalNightHours, 2);
-        $totalDayHours = round($totalDayHours, 2);
+        
+        $totalNightFractionMinutes = $this->convertFractionToMinutes($totalNightHours);
+        $totalDayFractionMinutes = $this->convertFractionToMinutes($totalDayHours);
 
         return response()->json([
-            'timeslots' => $timeslotsWithNightAndDayHours,
-            'totalNightHours' => $totalNightHours,
-            'totalDayHours' => $totalDayHours,
+            'timeslots' => $timeslotsWithNightAndDayHours->map(function($timeslot){
+                return [
+                    'id' => $timeslot->id,
+                    'start_time' => $timeslot->start_time,
+                    'end_time' => $timeslot->end_time,
+                    'night_hours' => [
+                        'hours' => $timeslot->night_hours,
+                        'minutes' => $timeslot->night_minutes,
+                    ],
+                    'day_hours' => [
+                        'hours' => $timeslot->day_hours,
+                        'minutes' => $timeslot->day_minutes,
+                    ],
+                ];
+            }),
+            'totalNightHours' => [
+                'hours' => floor($totalNightHours),
+                'minutes' => $totalNightFractionMinutes,
+            ],
+            'totalDayHours' => [
+                'hours' => floor($totalDayHours),
+                'minutes' => $totalDayFractionMinutes,
+            ],
         ], 200);
+    }
+
+    public function convertFractionToMinutes($hours)
+    {
+        $fractionalHours = $hours - floor($hours);
+        $minutes = round($fractionalHours * 60, 2);
+        return $minutes;
     }
 
     public function store(Request $request)
