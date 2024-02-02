@@ -13,7 +13,7 @@
                 <table class="w-100 table table-hover dataTableSimple table-striped">
                     <thead>
                         <tr>
-                            <th v-for="column in columns" :key="column">{{ column }}</th>
+                            <th class="text-center" v-for="column in columns" :key="column">{{ column }}</th>
                         </tr>
                     </thead>
                     <tbody>

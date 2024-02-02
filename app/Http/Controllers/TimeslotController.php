@@ -11,7 +11,7 @@ class TimeslotController extends Controller
 {
     public function index()
     {
-        $timeslots = Timeslot::orderBy("created_at", "asc")->select('id','start_time', 'end_time')->get();
+        $timeslots = Timeslot::orderBy("created_at", "asc")->select('id', 'start_time', 'end_time')->get();
         $totalNightHours = 0;
         $totalDayHours = 0;
 
@@ -21,6 +21,10 @@ class TimeslotController extends Controller
             $timeslot->day_hours = $hours['day_hours'];
             $totalNightHours += $hours['night_hours'];
             $totalDayHours += $hours['day_hours'];
+
+            $timeslot->start_time = Carbon::createFromFormat('Y-m-d H:i:s', $timeslot->start_time)->format('d/m/Y H:i');
+            $timeslot->end_time = Carbon::createFromFormat('Y-m-d H:i:s', $timeslot->end_time)->format('d/m/Y H:i');
+
             return $timeslot;
         });
 

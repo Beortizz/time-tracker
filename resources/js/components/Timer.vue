@@ -12,9 +12,9 @@
       </template>
       <template v-slot:tableBody>
         <tr v-for="row in rows" :key="row.id">
-          <td v-for="(value, key) in row" :key="value">{{ value }}</td>
-          <td>
-            <button class="btn btn-success" @click="editTimeslot(row.id)">Edit</button>
+          <td  class="text-center" v-for="(value, key) in row" :key="value">{{ value }}</td>
+          <td class="justify-content-center d-flex gap-2">
+            <button class="btn btn-success" data-bs-target="#time_modal" data-bs-toggle="modal" @click="editTimeslot(row.id)">Edit</button>
             <button class="btn btn-danger" @click="deleteTimeslot(row.id)">Delete</button>
           </td>
         </tr>
@@ -94,6 +94,7 @@ export default {
       rows: [],
       totalDayHours: 0,
       totalNightHours: 0,
+      
     }
   },
 
@@ -112,7 +113,7 @@ export default {
         });
     },
 
-    submitTimeslot({ target }) {
+    submitTimeslot() {
       axios
         .post('/timeslots', {
           start_time: this.start_time,
@@ -125,7 +126,8 @@ export default {
             showConfirmButton: false,
             timer: 1500
           });
-          target.reset();
+          this.start_time = '';
+          this.end_time = ''; 
           const modal = document.getElementById('time_modal');
           const modalInstance = bootstrap.Modal.getInstance(modal);
           modalInstance.hide();

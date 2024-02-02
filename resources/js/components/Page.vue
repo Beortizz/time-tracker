@@ -1,7 +1,6 @@
 <template>
     <div class="container-fluid">
         <div class="row flex-nowrap">
-            <Sidebar v-if="!hideSidebar" />
             <div class="col py-3">
                 <slot/>
             </div>
