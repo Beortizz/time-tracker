@@ -24,8 +24,8 @@
       <Table title="Resumo das Horas Trabalhadas" :columns="hoursSummaryColumns">
         <template v-slot:tableBody>
           <tr>
-            <td class="text-center">{{ `${totalNightHours.hours}`.padStart(2, '0') + ':' + `${totalNightHours.minutes.toFixed(0)}`.padStart(2, '0') }}</td>
-            <td class="text-center">{{ `${totalDayHours.hours}`.padStart(2, '0') + ':' + `${totalDayHours.minutes.toFixed(0)}`.padStart(2, '0') }} </td>
+            <td class="text-center">{{ `${totalNightHours.hours}`.padStart(2, '0') + ':' + `${totalNightHours.minutes?.toFixed(0)}`.padStart(2, '0') }}</td>
+            <td class="text-center">{{ `${totalDayHours.hours}`.padStart(2, '0') + ':' + `${totalDayHours.minutes?.toFixed(0)}`.padStart(2, '0') }} </td>
           </tr>
         </template>
       </Table>
