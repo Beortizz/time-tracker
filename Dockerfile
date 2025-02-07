@@ -11,7 +11,7 @@ RUN npm install
 RUN npm run build
 
 FROM serversideup/php:8.3-fpm-apache
-
+ARG VITE_APP_BASE_URL
 ENV APP_NAME 'Laravel'
 ENV APP_ENV 'production'
 ENV APP_KEY ''
@@ -57,7 +57,7 @@ ENV VITE_PUSHER_HOST $PUSHER_HOST
 ENV VITE_PUSHER_PORT $PUSHER_PORT
 ENV VITE_PUSHER_SCHEME $PUSHER_SCHEME
 ENV VITE_PUSHER_APP_CLUSTER $PUSHER_APP_CLUSTER
-ENV VITE_APP_BASE_URL=http://localhost:8000/api
+ENV VITE_APP_BASE_URL 'http://localhost:8000/api'
 
 USER www-data:www-data
 WORKDIR /var/www/html
