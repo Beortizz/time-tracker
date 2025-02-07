@@ -10,9 +10,7 @@ export default defineConfig({
         }),
         vue()
     ],
-    define: {
-        'process.env': {
-            VUE_APP_BASE_URL: process.env.VITE_APP_BASE_URL || 'http://127.0.0.1:8000/api'
-        }
+   define: {
+        'import.meta.env.VITE_APP_BASE_URL': JSON.stringify(process.env.VITE_APP_BASE_URL || 'http://127.0.0.1:8000/api')
     }
 });
